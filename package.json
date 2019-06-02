@@ -1,0 +1,54 @@
+{
+  "name": "Queue-project",
+  "version": "1.0.0",
+  "description": "VBDD Queue one week project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app/index.js",
+    "dev": "./node_modules/.bin/nodemon app/index.js",
+    "lint": "./node_modules/.bin/eslint -c .eslintrc.js app/",
+    "lint:fix": "./node_modules/.bin/eslint -c .eslintrc.js app/ --fix"
+  },
+  "precommit": [
+    "lint"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vbdd-corp/Queue-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vbdd-corp/Queue-project/issues"
+  },
+  "keywords": [
+    "queue",
+    "vbdd"
+  ],
+  "author": "VBDD-Corp",
+  "license": "ISC",
+  "homepage": "https://github.com/vbdd-corp/Queue-project#readme",
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "cors": "2.8.5",
+    "ejs": "^2.6.1",
+    "emailjs": "^2.2.0",
+    "express": "^4.16.4",
+    "express-fileupload": "^1.1.4",
+    "joi": "14.3.1",
+    "make-dir": "^3.0.0",
+    "morgan": "1.9.1",
+    "rimraf": "^2.6.3"
+  },
+  "devDependencies": {
+    "eslint": "5.13.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.16.0",
+    "nodemon": "1.18.10",
+    "pre-commit": "1.2.2"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "mocks/*"
+    ]
+  }
+}
