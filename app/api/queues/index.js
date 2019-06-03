@@ -92,7 +92,7 @@ router.put('/:queueId/remove/:visitorId', (req, res) => {
   }
 });
 
-router.get('/:queueId/next-visitor', (req, res) => {
+router.put('/:queueId/next-visitor', (req, res) => {
   try {
 
     const queue = Queue.getById(req.params.queueId);
@@ -118,7 +118,7 @@ router.get('/:queueId/next-visitor', (req, res) => {
   }
 });
 
-router.get('/:queueId/previous-visitor', (req, res) => {
+router.put('/:queueId/previous-visitor', (req, res) => {
   try {
 
     const queue = Queue.getById(req.params.queueId);
