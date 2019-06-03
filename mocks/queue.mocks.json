@@ -2,7 +2,11 @@
   {
     "id": 1,
     "visitorsIds": [
-      1
-    ]
+      1,
+      2,
+      3,
+      4
+    ],
+    "currentIndex": 0
   }
 ]
