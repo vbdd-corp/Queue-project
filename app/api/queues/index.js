@@ -11,11 +11,33 @@ function logThis(str) {
 
 const router = new Router();
 
-router.get('/', (req, res) => res.status(200).json(Queue.get()));
+function getQueueLateSafely(qlId) {
+  try {
+    return QueueLate.getById(qlId);
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      return null;
+    }
+    throw err;
+  }
+}
+
+const attachQueueLate = (queue) => {
+  const resQueue = Object.assign({}, queue, {
+    lateQueue: getQueueLateSafely(queue.lateQueueId),
+  });
+  delete resQueue.lateQueueId;
+  return resQueue;
+};
+
+router.get('/', (req, res) => {
+  const resArray = Queue.get().map(queue => attachQueueLate(queue));
+  res.status(200).json(resArray);
+});
 
 router.get('/:queueId', (req, res) => {
   try {
-    res.status(200).json(Queue.getById(req.params.queueId));
+    res.status(200).json(attachQueueLate(Queue.getById(req.params.queueId)));
   } catch (err) {
     if (err.name === 'NotFoundError') {
       res.status(404).end();
