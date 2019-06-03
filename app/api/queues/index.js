@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { Queue } = require('../../models');
+const { QueueLate } = require('../../models');
 const { Visitor } = require('../../models');
 
 /* const Logger = require('../../utils/logger');
@@ -27,9 +28,28 @@ router.get('/:queueId', (req, res) => {
 router.post('/', (req, res) => {
   try {
     const newQueue = Queue.createWithNextId(req.body);
-    if (!newQueue.visitorsIds) newQueue.visitorsIds = [];
-    if (!newQueue.currentIndex) newQueue.currentIndex = 0;
-    res.status(201).json(newQueue);
+    if (typeof newQueue.visitorsIds === 'undefined'
+      || !newQueue.visitorsIds) {
+      Queue.update(newQueue.id, {
+        visitorsIds: [],
+      });
+    }
+    if (typeof newQueue.currentIndex === 'undefined'
+      || !newQueue.currentIndex) {
+      newQueue.currentIndex = 0;
+      Queue.update(newQueue.id, {
+        currentIndex: 0,
+      });
+    }
+
+    const newQueueLate = QueueLate.createWithNextId({
+      lateVisitorsIds: [],
+      indexOfLateVisitorsInMainQueue: [],
+    });
+    Queue.update(newQueue.id, {
+      lateQueueId: newQueueLate.id,
+    });
+    res.status(201).json(Queue.getById(newQueue.id));
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).json(err.extra);
@@ -149,5 +169,21 @@ router.put('/:queueId/previous-visitor', (req, res) => {
   }
 });
 
+router.delete('/:queueId', (req, res) => {
+  let queueId = req.params.queueId; // eslint-disable-line
+  if (typeof queueId === 'string') queueId = parseInt(queueId, 10);
+  try {
+    const queue = Queue.getById(queueId);
+    QueueLate.delete(queue.lateQueueId);
+    Queue.delete(queue.id);
+    res.status(204).end();
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      res.status(404).end();
+    } else {
+      res.status(500).json(err);
+    }
+  }
+});
 
 module.exports = router;

@@ -7,6 +7,7 @@ class Queue extends BaseModel {
       id: Joi.number().required(),
       visitorsIds: Joi.array().items(Joi.number()),
       currentIndex: Joi.number(),
+      lateQueueId: Joi.number(),
     });
   }
 }
