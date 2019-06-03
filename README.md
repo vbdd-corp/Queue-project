@@ -17,9 +17,9 @@ one week ps project
 
  - get '/' -> return the list of all queues
  - get '/:queueId' -> return the queue of id : queueId
- - get '/:queueId/next-visitor' -> return the next visitor and update the queue
- - get '/:queueId/previous-visitor' -> return the previous visitor and update the queue
  
+ - put '/:queueId/next-visitor' -> return the next visitor and update the queue
+ - put '/:queueId/previous-visitor' -> return the previous visitor and update the queue
  - put '/:queueId'
  - put '/:queueId/add/:visitorId' -> add the visitor of id visitorId to the end of the queue
  - put '/:queueId/remove/:visitorId' -> remove the visitor of id visitorId from queue
