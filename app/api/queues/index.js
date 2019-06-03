@@ -2,6 +2,12 @@ const { Router } = require('express');
 const { Queue } = require('../../models');
 const { Visitor } = require('../../models');
 
+/* const Logger = require('../../utils/logger');
+function logThis(str) {
+  Logger.log(str);
+}
+*/
+
 const router = new Router();
 
 router.get('/', (req, res) => res.status(200).json(Queue.get()));
@@ -94,10 +100,9 @@ router.put('/:queueId/remove/:visitorId', (req, res) => {
 
 router.put('/:queueId/next-visitor', (req, res) => {
   try {
-
     const queue = Queue.getById(req.params.queueId);
 
-    if(queue.visitorsIds.length === 0){
+    if (queue.visitorsIds.length === 0) {
       res.status(404).end();
       return;
     }
@@ -120,10 +125,9 @@ router.put('/:queueId/next-visitor', (req, res) => {
 
 router.put('/:queueId/previous-visitor', (req, res) => {
   try {
-
     const queue = Queue.getById(req.params.queueId);
 
-    if(queue.visitorsIds.length <= 1 || queue.currentIndex <= 1){
+    if (queue.visitorsIds.length <= 1 || queue.currentIndex <= 1) {
       res.status(404).end();
       return;
     }
