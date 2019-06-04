@@ -1,33 +1,59 @@
 const { Router } = require('express');
 const { QueueLate } = require('../../models');
-const Logger = require('../../utils/logger');
+const { Queue } = require('../../models');
 
-const router = new Router();
+const Logger = require('../../utils/logger');
 
 function logThis(str) {
   Logger.log(str);
 }
+const router = new Router();
+
+function getQueueSafely(qlId) {
+  try {
+    return Queue.getById(qlId);
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      return null;
+    }
+    throw err;
+  }
+}
+
+const attachQueue = (lateQueue) => {
+  const resLateQueue = Object.assign({}, lateQueue, {
+    queue: getQueueSafely(lateQueue.queueId),
+  });
+  delete resLateQueue.queueId;
+  return resLateQueue;
+};
 
 router.get('/status', (req, res) => res.status(200).json('ok QueueLate'));
-router.get('/', (req, res) => res.status(200).json(QueueLate.get()));
+router.get('/', (req, res) => {
+  const resArray = QueueLate.get().map(qlate => attachQueue(qlate));
+  res.status(200).json(resArray);
+});
 
+router.get('/:queueLateId', (req, res) => {
+  try {
+    res.status(200).json(attachQueue(QueueLate.getById(req.params.queueLateId)));
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      res.status(404).end();
+    } else {
+      res.status(500).json(err);
+    }
+  }
+});
 
 router.post('/', (req, res) => {
   try {
     const newLateQueue = QueueLate.createWithNextId(req.body);
-    if (typeof newLateQueue.lateVisitorsIds === 'undefined'
-      || !newLateQueue.lateVisitorsIds) {
-      QueueLate.update(newLateQueue.id, {
-        lateVisitorsIds: [],
-      });
-    }
-    if (typeof newLateQueue.indexOfLateVisitorsInMainQueue === 'undefined'
-      || !newLateQueue.indexOfLateVisitorsInMainQueue) {
-      QueueLate.update(newLateQueue.id, {
-        indexOfLateVisitorsInMainQueue: [],
-      });
-    }
-    res.status(201).json(QueueLate.getById(newLateQueue.id));
+    if (!newLateQueue.lateVisitorsIds) newLateQueue.lateVisitorsIds = [];
+    if (!newLateQueue.queueId) newLateQueue.queueId = -1;
+
+    QueueLate.update(newLateQueue.id, newLateQueue);
+    res.status(201).json(newLateQueue);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).json(err.extra);
@@ -39,30 +65,6 @@ router.post('/', (req, res) => {
 });
 
 /*
-* const attachQueueLate = (queue) => {
-  const resQueue = Object.assign({}, queue, {
-    lateQueue: getQueueLateSafely(queue.lateQueueId),
-  });
-  delete resQueue.lateQueueId;
-  return resQueue;
-};
-*
-* router.get('/', (req, res) => {
-  const resArray = Queue.get().map(queue => attachQueueLate(queue));
-  res.status(200).json(Queue.get());
-});
-*
-* function getQueueLateSafely(qlId) {
-  try {
-    return QueueLate.getById(qlId);
-  } catch (err) {
-    if (err.name === 'NotFoundError') {
-      return null;
-    }
-    throw err;
-  }
-}
-*
 * const newQueueLate = QueueLate.createWithNextId({
       lateVisitorsIds: [],
       indexOfLateVisitorsInMainQueue: [],

@@ -6,7 +6,6 @@ class QueueLate extends BaseModel {
     super('QueueLate', {
       id: Joi.number().required(),
       lateVisitorsIds: Joi.array().items(Joi.number()),
-      indexOfLateVisitorsInMainQueue: Joi.array().items(Joi.number()),
       queueId: Joi.number(),
     });
   }
