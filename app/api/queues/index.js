@@ -1,12 +1,12 @@
 const { Router } = require('express');
 const { Queue } = require('../../models');
+const { QueueLate } = require('../../models');
 const { Visitor } = require('../../models');
 
 /* const Logger = require('../../utils/logger');
 function logThis(str) {
   Logger.log(str);
-}
-*/
+} */
 
 const router = new Router();
 
@@ -30,9 +30,12 @@ router.post('/', (req, res) => {
   try {
     const newQueue = Queue.createWithNextId(req.body);
     if (!newQueue.visitorsIds) newQueue.visitorsIds = [];
-
     if (!newQueue.currentIndex) newQueue.currentIndex = 0;
 
+    QueueLate.createWithNextId({
+      lateVisitorsIds: [],
+      queueId: newQueue.id,
+    });
     Queue.update(newQueue.id, newQueue);
     res.status(201).json(newQueue);
   } catch (err) {
@@ -159,7 +162,11 @@ router.delete('/:queueId', (req, res) => {
   if (typeof queueId === 'string') queueId = parseInt(queueId, 10);
   try {
     const queue = Queue.getById(queueId);
-    // QueueLate.delete(queue.lateQueueId);
+    const queueLateToDeleteList = QueueLate.get()
+      .filter(queueLate => queueLate.queueId === queueId);
+    queueLateToDeleteList.forEach(
+      queueLateToDelete => QueueLate.delete(queueLateToDelete.id),
+    );
     Queue.delete(queue.id);
     res.status(204).end();
   } catch (err) {

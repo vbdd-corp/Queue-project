@@ -67,7 +67,6 @@ router.post('/', (req, res) => {
 /*
 * const newQueueLate = QueueLate.createWithNextId({
       lateVisitorsIds: [],
-      indexOfLateVisitorsInMainQueue: [],
     });
     Queue.update(newQueue.id, {
       lateQueueId: newQueueLate.id,
