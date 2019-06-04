@@ -132,8 +132,41 @@ router.put('/:queueId/next-visitor', (req, res) => {
   }
 });
 
+router.put('/:queueId/next-visitor/strategy/1', (req, res) => {
+  try {
+    const queue = Queue.getById(req.params.queueId);
+    const queueLate = QueueLate.get().filter(ql => ql.queueId === queue.id)[0];
+
+    if (queue.visitorsIds.length === 0 && queueLate.lateVisitorsIds.length === 0) {
+      res.status(404).end();
+      return;
+    }
+    let visitorId;
+    if (queue.currentIndex === queue.visitorsIds.length
+      && queueLate.lateVisitorsIds.length > 0) {
+      visitorId = queueLate.lateVisitorsIds.shift();
+    } else {
+      queue.currentIndex += 1;
+      visitorId = queue.visitorsIds[queue.currentIndex];
+      // queueLate.myBool = 1;
+    }
+
+    QueueLate.update(queueLate.id, queueLate);
+    Queue.update(queue.id, queue);
+
+    res.status(200).json(Visitor.getById(visitorId));
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      res.status(404).end();
+    } else if (err.name === 'ValidationError') {
+      res.status(400).json(err.extra);
+    } else {
+      res.status(500).json(err);
+    }
+  }
+});
+
 router.put('/:queueId/next-visitor/strategy/2', (req, res) => {
-  /* WIP */
   try {
     const queue = Queue.getById(req.params.queueId);
     const queueLate = QueueLate.get().filter(ql => ql.queueId === queue.id)[0];
@@ -161,6 +194,35 @@ router.put('/:queueId/next-visitor/strategy/2', (req, res) => {
     Queue.update(queue.id, queue);
 
     res.status(200).json(Visitor.getById(visitorId));
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      res.status(404).end();
+    } else if (err.name === 'ValidationError') {
+      res.status(400).json(err.extra);
+    } else {
+      res.status(500).json(err);
+    }
+  }
+});
+
+router.put('/:queueId/absent-visitor/strategy/1', (req, res) => {
+  try {
+    const queue = Queue.getById(req.params.queueId);
+
+    if (queue.visitorsIds.length === 0) {
+      res.status(404).end();
+      return;
+    }
+
+    const visitorMissingId = queue.visitorsIds[queue.currentIndex];
+    const queueLate = QueueLate.get().filter(ql => ql.queueId === queue.id)[0];
+    queueLate.lateVisitorsIds.push(visitorMissingId);
+
+    queue.currentIndex += 1;
+    Queue.update(queue.id, queue);
+    QueueLate.update(queueLate.id, queueLate);
+
+    res.status(200).json(Visitor.getById(queue.visitorsIds[queue.currentIndex]));
   } catch (err) {
     if (err.name === 'NotFoundError') {
       res.status(404).end();
