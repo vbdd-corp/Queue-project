@@ -173,7 +173,7 @@ router.put('/:queueId/previous-visitor', (req, res) => {
       return;
     }
 
-    const visitorId = queue.visitorsIds[queue.currentIndex];
+    const visitorId = queue.visitorsIds[queue.currentIndex - 1];
     logThis(visitorId);
     if (queueLate.lateVisitorsIds.length > 0 && queueLate.lateVisitorsIds.includes(visitorId)) {
       logThis(visitorId);
@@ -274,7 +274,7 @@ router.put('/:queueId/absent-visitor', (req, res) => {
       return;
     }
 
-    const visitorMissingId = queue.visitorsIds[queue.currentIndex];
+    const visitorMissingId = queue.visitorsIds[queue.currentIndex - 1];
     const queueLate = QueueLate.get().filter(ql => ql.queueId === queue.id)[0];
     queueLate.lateVisitorsIds.push(visitorMissingId);
 
