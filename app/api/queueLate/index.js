@@ -38,6 +38,41 @@ router.post('/', (req, res) => {
   }
 });
 
+/*
+* const attachQueueLate = (queue) => {
+  const resQueue = Object.assign({}, queue, {
+    lateQueue: getQueueLateSafely(queue.lateQueueId),
+  });
+  delete resQueue.lateQueueId;
+  return resQueue;
+};
+*
+* router.get('/', (req, res) => {
+  const resArray = Queue.get().map(queue => attachQueueLate(queue));
+  res.status(200).json(Queue.get());
+});
+*
+* function getQueueLateSafely(qlId) {
+  try {
+    return QueueLate.getById(qlId);
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      return null;
+    }
+    throw err;
+  }
+}
+*
+* const newQueueLate = QueueLate.createWithNextId({
+      lateVisitorsIds: [],
+      indexOfLateVisitorsInMainQueue: [],
+    });
+    Queue.update(newQueue.id, {
+      lateQueueId: newQueueLate.id,
+    });
+*
+* */
+
 router.delete('/:queueLateId', (req, res) => {
   let queueLateId = req.params.queueLateId; // eslint-disable-line
   if (typeof queueLateId === 'string') queueLateId = parseInt(queueLateId, 10);

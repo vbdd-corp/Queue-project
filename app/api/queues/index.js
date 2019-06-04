@@ -1,6 +1,5 @@
 const { Router } = require('express');
 const { Queue } = require('../../models');
-const { QueueLate } = require('../../models');
 const { Visitor } = require('../../models');
 
 /* const Logger = require('../../utils/logger');
@@ -11,33 +10,13 @@ function logThis(str) {
 
 const router = new Router();
 
-function getQueueLateSafely(qlId) {
-  try {
-    return QueueLate.getById(qlId);
-  } catch (err) {
-    if (err.name === 'NotFoundError') {
-      return null;
-    }
-    throw err;
-  }
-}
-
-const attachQueueLate = (queue) => {
-  const resQueue = Object.assign({}, queue, {
-    lateQueue: getQueueLateSafely(queue.lateQueueId),
-  });
-  delete resQueue.lateQueueId;
-  return resQueue;
-};
-
 router.get('/', (req, res) => {
-  const resArray = Queue.get().map(queue => attachQueueLate(queue));
-  res.status(200).json(resArray);
+  res.status(200).json(Queue.get());
 });
 
 router.get('/:queueId', (req, res) => {
   try {
-    res.status(200).json(attachQueueLate(Queue.getById(req.params.queueId)));
+    res.status(200).json(Queue.getById(req.params.queueId));
   } catch (err) {
     if (err.name === 'NotFoundError') {
       res.status(404).end();
@@ -50,28 +29,12 @@ router.get('/:queueId', (req, res) => {
 router.post('/', (req, res) => {
   try {
     const newQueue = Queue.createWithNextId(req.body);
-    if (typeof newQueue.visitorsIds === 'undefined'
-      || !newQueue.visitorsIds) {
-      Queue.update(newQueue.id, {
-        visitorsIds: [],
-      });
-    }
-    if (typeof newQueue.currentIndex === 'undefined'
-      || !newQueue.currentIndex) {
-      newQueue.currentIndex = 0;
-      Queue.update(newQueue.id, {
-        currentIndex: 0,
-      });
-    }
+    if (!newQueue.visitorsIds) newQueue.visitorsIds = [];
 
-    const newQueueLate = QueueLate.createWithNextId({
-      lateVisitorsIds: [],
-      indexOfLateVisitorsInMainQueue: [],
-    });
-    Queue.update(newQueue.id, {
-      lateQueueId: newQueueLate.id,
-    });
-    res.status(201).json(Queue.getById(newQueue.id));
+    if (!newQueue.currentIndex) newQueue.currentIndex = 0;
+
+    Queue.update(newQueue.id, newQueue);
+    res.status(201).json(newQueue);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).json(err.extra);
@@ -196,7 +159,7 @@ router.delete('/:queueId', (req, res) => {
   if (typeof queueId === 'string') queueId = parseInt(queueId, 10);
   try {
     const queue = Queue.getById(queueId);
-    QueueLate.delete(queue.lateQueueId);
+    // QueueLate.delete(queue.lateQueueId);
     Queue.delete(queue.id);
     res.status(204).end();
   } catch (err) {
