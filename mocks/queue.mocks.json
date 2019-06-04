@@ -7,6 +7,77 @@
       3,
       4
     ],
-    "currentIndex": 1
+    "currentIndex": 3
+  },
+  {
+    "id": 2,
+    "visitorsIds": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "currentIndex": 0
+  },
+  {
+    "id": 3,
+    "visitorsIds": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "currentIndex": 0
+  },
+  {
+    "id": 4,
+    "visitorsIds": [
+      5,
+      6,
+      7,
+      9,
+      10,
+      15
+    ],
+    "currentIndex": 0
+  },
+  {
+    "id": 5,
+    "visitorsIds": [
+      5,
+      6,
+      7,
+      8,
+      2,
+      3,
+      6,
+      1
+    ],
+    "currentIndex": 0
+  },
+  {
+    "id": 6,
+    "visitorsIds": [
+      9,
+      10,
+      11,
+      12,
+      14
+    ],
+    "currentIndex": 0
+  },
+  {
+    "id": 7,
+    "visitorsIds": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      15,
+      14,
+      2
+    ],
+    "currentIndex": 0
   }
 ]
