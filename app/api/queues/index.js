@@ -3,10 +3,12 @@ const { Queue } = require('../../models');
 const { QueueLate } = require('../../models');
 const { Visitor } = require('../../models');
 
-/* const Logger = require('../../utils/logger');
+const Logger = require('../../utils/logger');
+
+// eslint-disable-next-line no-unused-vars
 function logThis(str) {
   Logger.log(str);
-} */
+}
 
 const router = new Router();
 
@@ -17,6 +19,29 @@ router.get('/', (req, res) => {
 router.get('/:queueId', (req, res) => {
   try {
     res.status(200).json(Queue.getById(req.params.queueId));
+  } catch (err) {
+    if (err.name === 'NotFoundError') {
+      res.status(404).end();
+    } else {
+      res.status(500).json(err);
+    }
+  }
+});
+
+router.get('/:queueId/number-left', (req, res) => {
+  try {
+    const queue = Queue.getById(req.params.queueId);
+    let left = queue.visitorsIds.length - queue.currentIndex;
+
+    const possibleQueueLate = QueueLate.get().filter(q => q.queueId === queue.id);
+
+    if (possibleQueueLate.length > 0) {
+      left += possibleQueueLate[0].lateVisitorsIds.length;
+    }
+
+    if (left < 0) left = 0;
+
+    res.status(200).json(left);
   } catch (err) {
     if (err.name === 'NotFoundError') {
       res.status(404).end();
