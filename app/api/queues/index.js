@@ -157,6 +157,41 @@ router.put('/:queueId/next-visitor', (req, res) => {
   }
 });
 
+router.put('/:queueId/previous-visitor', (req, res) => {
+  try {
+    /* WIP */
+    const queue = Queue.getById(req.params.queueId);
+    const queueLate = QueueLate.get().filter(ql => ql.queueId === queue.id)[0];
+
+    queue.currentIndex -= 1;
+    if (queue.currentIndex < 0) queue.currentIndex = 0;
+    Queue.update(queue.id, queue);
+
+    if (queue.visitorsIds.length <= 1 || queue.currentIndex <= 1) {
+      logThis('OOOOH 1');
+      res.status(404).end();
+      return;
+    }
+
+    // -2 , because the index is actually on the next visitor
+    const visitorId = queue.visitorsIds[queue.currentIndex - 2];
+    if (queueLate.lateVisitorsIds.length > 0 && queueLate.lateVisitorsIds.includes(visitorId)) {
+      remove(queueLate.lateVisitorsIds, visitorId);
+    }
+    QueueLate.update(queueLate.id, queueLate);
+    res.status(200).json(Visitor.getById(visitorId));
+  } catch (err) {
+    logThis(err);
+    if (err.name === 'NotFoundError') {
+      res.status(404).end();
+    } else if (err.name === 'ValidationError') {
+      res.status(400).json(err.extra);
+    } else {
+      res.status(500).json(err);
+    }
+  }
+});
+
 router.put('/:queueId/next-visitor/strategy/1', (req, res) => {
   try {
     const queue = Queue.getById(req.params.queueId);
@@ -173,7 +208,6 @@ router.put('/:queueId/next-visitor/strategy/1', (req, res) => {
     } else {
       visitorId = queue.visitorsIds[queue.currentIndex];
       queue.currentIndex += 1;
-      // queueLate.myBool = 1;
     }
 
     QueueLate.update(queueLate.id, queueLate);
@@ -248,33 +282,6 @@ router.put('/:queueId/absent-visitor', (req, res) => {
     QueueLate.update(queueLate.id, queueLate);
 
     res.status(200).json(Visitor.getById(queue.visitorsIds[queue.currentIndex]));
-  } catch (err) {
-    if (err.name === 'NotFoundError') {
-      res.status(404).end();
-    } else if (err.name === 'ValidationError') {
-      res.status(400).json(err.extra);
-    } else {
-      res.status(500).json(err);
-    }
-  }
-});
-
-
-router.put('/:queueId/previous-visitor', (req, res) => {
-  try {
-    const queue = Queue.getById(req.params.queueId);
-
-    if (queue.visitorsIds.length <= 1 || queue.currentIndex <= 1) {
-      res.status(404).end();
-      return;
-    }
-
-    // -2 , because the index is actually on the next visitor
-    const visitorId = queue.visitorsIds[queue.currentIndex - 2];
-    queue.currentIndex -= 1;
-    Queue.update(queue.id, queue);
-
-    res.status(200).json(Visitor.getById(visitorId));
   } catch (err) {
     if (err.name === 'NotFoundError') {
       res.status(404).end();
