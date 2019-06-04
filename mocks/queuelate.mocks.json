@@ -2,6 +2,7 @@
   {
     "id": 1,
     "lateVisitorsIds": [],
-    "queueId": 1
+    "queueId": 1,
+    "myBool": 0
   }
 ]

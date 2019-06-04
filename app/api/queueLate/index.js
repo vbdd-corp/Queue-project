@@ -51,6 +51,7 @@ router.post('/', (req, res) => {
     const newLateQueue = QueueLate.createWithNextId(req.body);
     if (!newLateQueue.lateVisitorsIds) newLateQueue.lateVisitorsIds = [];
     if (!newLateQueue.queueId) newLateQueue.queueId = -1;
+    if (!newLateQueue.myBool) newLateQueue.myBool = 0;
 
     QueueLate.update(newLateQueue.id, newLateQueue);
     res.status(201).json(newLateQueue);
