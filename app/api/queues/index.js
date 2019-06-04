@@ -167,15 +167,16 @@ router.put('/:queueId/previous-visitor', (req, res) => {
     if (queue.currentIndex < 0) queue.currentIndex = 0;
     Queue.update(queue.id, queue);
 
-    if (queue.visitorsIds.length <= 1 || queue.currentIndex <= 1) {
+    if (queue.visitorsIds.length <= 1 || queue.currentIndex < 1) {
       logThis('OOOOH 1');
       res.status(404).end();
       return;
     }
 
-    // -2 , because the index is actually on the next visitor
-    const visitorId = queue.visitorsIds[queue.currentIndex - 2];
+    const visitorId = queue.visitorsIds[queue.currentIndex];
+    logThis(visitorId);
     if (queueLate.lateVisitorsIds.length > 0 && queueLate.lateVisitorsIds.includes(visitorId)) {
+      logThis(visitorId);
       remove(queueLate.lateVisitorsIds, visitorId);
     }
     QueueLate.update(queueLate.id, queueLate);
@@ -281,7 +282,8 @@ router.put('/:queueId/absent-visitor', (req, res) => {
     Queue.update(queue.id, queue);
     QueueLate.update(queueLate.id, queueLate);
 
-    res.status(200).json(Visitor.getById(queue.visitorsIds[queue.currentIndex]));
+    // -1, the current id is already on the next visitor
+    res.status(200).json(Visitor.getById(queue.visitorsIds[queue.currentIndex - 1]));
   } catch (err) {
     if (err.name === 'NotFoundError') {
       res.status(404).end();
