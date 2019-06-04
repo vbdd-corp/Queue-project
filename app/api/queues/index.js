@@ -138,23 +138,22 @@ router.put('/:queueId/next-visitor/strategy/2', (req, res) => {
     const queue = Queue.getById(req.params.queueId);
     const queueLate = QueueLate.get().filter(ql => ql.queueId === queue.id)[0];
 
-    if (queue.visitorsIds.length === 0) {
+    if (queue.visitorsIds.length === 0 && queueLate.lateVisitorsIds.length === 0) {
       res.status(404).end();
       return;
     }
 
     let visitorId;
-    /* if (queue.currentIndex === queue.visitorsIds.length
+    if (queue.currentIndex === queue.visitorsIds.length
       && queueLate.lateVisitorsIds.length > 0) {
-
-    } */
-
-    if (queueLate.lateVisitorsIds.length > 0 && queueLate.myBool === 1) {
+      visitorId = queueLate.lateVisitorsIds.shift();
+    } else if (queueLate.lateVisitorsIds.length > 0 && queueLate.myBool === 1) {
       visitorId = queueLate.lateVisitorsIds.shift();
       queueLate.myBool = 0;
     } else {
-      visitorId = queue.visitorsIds[queue.currentIndex];
       queue.currentIndex += 1;
+      visitorId = queue.visitorsIds[queue.currentIndex];
+
       queueLate.myBool = 1;
     }
 
@@ -190,7 +189,7 @@ router.put('/:queueId/absent-visitor/strategy/2', (req, res) => {
     Queue.update(queue.id, queue);
     QueueLate.update(queueLate.id, queueLate);
 
-    res.status(200).json(Visitor.getById(visitorMissingId));
+    res.status(200).json(Visitor.getById(queue.visitorsIds[queue.currentIndex]));
   } catch (err) {
     if (err.name === 'NotFoundError') {
       res.status(404).end();
