@@ -3,6 +3,42 @@
     "id": 1,
     "lateVisitorsIds": [],
     "queueId": 1,
-    "myBool": 0
+    "myBool": 1
+  },
+  {
+    "lateVisitorsIds": [],
+    "queueId": 2,
+    "myBool": 0,
+    "id": 2
+  },
+  {
+    "lateVisitorsIds": [],
+    "queueId": 3,
+    "myBool": 0,
+    "id": 3
+  },
+  {
+    "lateVisitorsIds": [],
+    "queueId": 4,
+    "myBool": 0,
+    "id": 4
+  },
+  {
+    "lateVisitorsIds": [],
+    "queueId": 5,
+    "myBool": 0,
+    "id": 5
+  },
+  {
+    "lateVisitorsIds": [],
+    "queueId": 6,
+    "myBool": 0,
+    "id": 6
+  },
+  {
+    "lateVisitorsIds": [],
+    "queueId": 7,
+    "myBool": 0,
+    "id": 7
   }
 ]

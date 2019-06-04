@@ -7,6 +7,36 @@
       3,
       4
     ],
-    "currentIndex": 2
+    "currentIndex": 3
+  },
+  {
+    "id": 2,
+    "visitorsIds": [],
+    "currentIndex": 0
+  },
+  {
+    "id": 3,
+    "visitorsIds": [],
+    "currentIndex": 0
+  },
+  {
+    "id": 4,
+    "visitorsIds": [],
+    "currentIndex": 0
+  },
+  {
+    "id": 5,
+    "visitorsIds": [],
+    "currentIndex": 0
+  },
+  {
+    "id": 6,
+    "visitorsIds": [],
+    "currentIndex": 0
+  },
+  {
+    "id": 7,
+    "visitorsIds": [],
+    "currentIndex": 0
   }
 ]
